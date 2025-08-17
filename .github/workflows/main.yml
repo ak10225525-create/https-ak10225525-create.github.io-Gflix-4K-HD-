@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>GFLIX 4K HD — Movies & TV</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --accent:#ff6b6b; --muted:#9aa4b2;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body {
+      font-family: 'Poppins', system-ui, sans-serif;
+      color: #e6eef6;
+      overflow-x: hidden;
+      background: linear-gradient(-45deg, #0a0f1e, #0f1724, #1a1f35, #0a0f1e);
+      background-size: 400% 400%;
+      animation: gradientBG 20s ease infinite;
+    }
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    /* glowing particles */
+    body::before {
+      content: "";
+      position: fixed; inset:0;
+      background-image: radial-gradient(circle, rgba(255,255,255,0.08) 2px, transparent 2px);
+      background-size: 80px 80px;
+      animation: moveStars 60s linear infinite;
+      z-index: -1;
+      opacity: 0.4;
+    }
+    @keyframes moveStars {
+      from { transform: translateY(0); }
+      to { transform: translateY(-200px); }
+    }
+    /* header */
+    header {
+      display:flex;align-items:center;gap:16px;
+      padding:18px 22px;
+      border-bottom:1px solid rgba(255,255,255,0.05);
+      position:sticky;top:0;z-index:10;
+      background:rgba(10,15,30,0.6);
+      backdrop-filter:blur(12px) saturate(180%);
+      box-shadow:0 4px 12px rgba(0,0,0,0.5);
+    }
+    .logo img{height:50px;border-radius:8px;filter:drop-shadow(0 0 10px rgba(255,255,255,0.3))}
+    nav{margin-left:auto;display:flex;gap:12px;align-items:center}
+    .search{display:flex;align-items:center;background:rgba(255,255,255,0.05);padding:8px 12px;border-radius:12px;gap:8px;transition:.3s}
+    .search:focus-within{box-shadow:0 0 15px rgba(0,200,255,0.6)}
+    .search input{background:transparent;border:0;color:inherit;outline:none;width:220px}
+    main{padding:24px;max-width:1200px;margin:0 auto}
+    /* hero */
+    .hero{margin-bottom:18px}
+    .hero .title {
+      font-size: clamp(22px, 4vw, 36px);
+      font-weight:700;
+      background: linear-gradient(90deg,#ff6b6b,#ff9f43,#00d4ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: shine 6s linear infinite, floaty 5s ease-in-out infinite;
+    }
+    @keyframes shine {0%{background-position:0% 50%}100%{background-position:200% 50%}}
+    @keyframes floaty {0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+    .filters{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+    /* buttons */
+    .btn {
+      background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+      border:1px solid rgba(255,255,255,0.1);
+      padding:8px 14px;
+      border-radius:12px;
+      cursor:pointer;color:#fff;
+      font-weight:500;
+      transition:all .3s ease;
+    }
+    .btn:hover {transform:translateY(-3px) scale(1.05);box-shadow:0 0 12px rgba(255,80,80,0.6);border-color:rgba(255,80,80,0.8)}
+    .btn.primary {
+      background: linear-gradient(135deg,#ff6b6b,#ff9f43);
+      color:#0f0f1e;font-weight:600;
+      box-shadow:0 0 12px rgba(255,120,80,0.8);
+    }
+    .btn.primary:hover {box-shadow:0 0 20px rgba(255,100,100,1)}
+    /* grid + cards */
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-top:18px}
+    .card {
+      background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+      border-radius:16px;overflow:hidden;
+      box-shadow:0 8px 24px rgba(0,0,0,0.8);
+      transition:transform .4s, box-shadow .4s;
+      transform-style:preserve-3d;
+    }
+    .card:hover {transform:perspective(900px) rotateY(6deg) rotateX(6deg) scale(1.07);box-shadow:0 18px 40px rgba(0,0,0,0.9),0 0 20px rgba(255,80,80,0.6)}
+    .poster{height:300px;background-size:cover;background-position:center;transition:transform .5s}
+    .card:hover .poster{transform:scale(1.08);filter:brightness(1.1) drop-shadow(0 0 15px rgba(255,80,80,0.6))}
+    .card-body{padding:12px}
+    .meta{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:8px}
+    .pill{padding:6px 8px;border-radius:999px;border:1px solid rgba(255,255,255,0.1);font-size:12px}
+    .title-sm{font-weight:600}
+    .card-actions{display:flex;gap:8px;margin-top:8px}
+    /* modal + cinema */
+    .modal-backdrop {
+      position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:40;
+      background:rgba(5,8,20,0.85);backdrop-filter:blur(8px);
+    }
+    .modal {
+      background:#0b1220;padding:12px;border-radius:16px;
+      max-width:1000px;width:95%;position:relative;
+      transform:scale(0.8) perspective(1000px) rotateX(-10deg);
+      opacity:0;transition:all .5s ease;
+      box-shadow:0 0 30px rgba(255,80,80,0.5),0 0 50px rgba(0,200,255,0.4);
+    }
+    .modal.show {transform:scale(1) perspective(1000px) rotateX(0);opacity:1;box-shadow:0 0 50px rgba(255,80,80,0.8),0 0 100px rgba(0,200,255,0.6)}
+    .modal iframe{width:100%;height:480px;border:0;border-radius:12px}
+    .close{position:absolute;right:18px;top:14px;background:transparent;border:0;color:#fff;font-size:22px;cursor:pointer;transition:.2s}
+    .close:hover{transform:scale(1.2) rotate(90deg);color:#ff6b6b}
+    /* cinema overlay */
+    .cinema-overlay{position:fixed;inset:0;pointer-events:none;z-index:35;opacity:0;transition:.6s;background:radial-gradient(circle at center, rgba(255,255,255,0.08) 0%, rgba(0,0,0,0.9) 70%)}
+    .cinema-overlay.active{opacity:1}
+    .cinema-overlay::before {
+      content:"";position:absolute;top:-100%;left:-100%;width:300%;height:300%;
+      background:radial-gradient(circle, rgba(255,200,150,0.15) 10%, transparent 60%);
+      animation:flareMove 12s linear infinite;mix-blend-mode:screen;
+    }
+    @keyframes flareMove {
+      0%{transform:translate(-20%,-20%) rotate(0)}
+      50%{transform:translate(20%,20%) rotate(180deg)}
+      100%{transform:translate(-20%,-20%) rotate(360deg)}
+    }
+    /* sound ripple */
+    .sound-ripple {
+      position: fixed;top:50%;left:50%;
+      width:20px;height:20px;transform:translate(-50%,-50%);
+      border-radius:50%;background:radial-gradient(circle, rgba(255,80,80,0.6) 20%, transparent 80%);
+      opacity:0;pointer-events:none;z-index:36;
+    }
+    .sound-ripple.active {animation:ripplePulse 2s ease-out infinite;opacity:1}
+    @keyframes ripplePulse {
+      0%{transform:translate(-50%,-50%) scale(0.5);opacity:.8}
+      50%{transform:translate(-50%,-50%) scale(3);opacity:.3}
+      100%{transform:translate(-50%,-50%) scale(5);opacity:0}
+    }
+    footer{padding:24px;color:var(--muted);text-align:center;margin-top:30px;font-size:14px}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo"><img src="1000072051.jpg" alt="GFLIX"> <div>GFLIX 4K HD</div></div>
+    <div class="search">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path stroke="currentColor" stroke-width="1.5" d="M21 21l-4.35-4.35M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16z"/></svg>
+      <input id="search" placeholder="Search movies, shows..."/>
+    </div>
+    <nav>
+      <button class="btn" onclick="showAll()">All</button>
+      <button class="btn" onclick="filterBy('movie')">Movies</button>
+      <button class="btn" onclick="filterBy('tv')">TV Shows</button>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="title">Discover movies & TV — trailers, summaries, and where to watch.</div>
+      <div class="filters">
+        <button class="btn primary" onclick="sortBy('popular')">Popular</button>
+        <button class="btn" onclick="sortBy('new')">Newest</button>
+        <button class="btn" onclick="sortBy('rating')">Top Rated</button>
+      </div>
+    </section>
+    <section id="catalog" class="grid"></section>
+    <footer>Made with ♥ — GFLIX 4K HD. Only legal sources.</footer>
+  </main>
+
+  <!-- overlays -->
+  <div class="cinema-overlay" id="cinema"></div>
+  <div class="sound-ripple" id="ripple"></div>
+
+  <!-- modal -->
+  <div id="backdrop" class="modal-backdrop" role="dialog" aria-hidden="true">
+    <div class="modal" id="modal">
+      <button class="close" onclick="closeModal()">✕</button>
+      <iframe id="trailerFrame" src="" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+    </div>
+  </div>
+
+  <script>
+    const data = [
+      { id:1,type:'movie',title:'Sample Movie 1',year:2024,rating:8.2,
+        poster:'https://via.placeholder.com/400x600?text=Sample+Movie+1',
+        trailer:'dQw4w9WgXcQ',where:'https://www.example.com/watch-1' },
+      { id:2,type:'tv',title:'Sample Series A',year:2022,rating:8.7,
+        poster:'https://via.placeholder.com/400x600?text=Sample+Series+A',
+        trailer:'tVj0ZTS4WF4',where:'https://www.example.com/watch-series-a' }
+    ];
+    const catalogEl=document.getElementById('catalog');
+    const searchInput=document.getElementById('search');
+
+    function render(list){
+      catalogEl.innerHTML='';
+      list.forEach(it=>{
+        const card=document.createElement('article');
+        card.className='card';
+        card.innerHTML=`
+          <div class="poster" style="background-image:url('${it.poster}')"></div>
+          <div class="card-body">
+            <div class="meta"><div class="pill">${it.type.toUpperCase()}</div><div>${it.year}</div></div>
+            <div class="title-sm">${it.title}</div>
+            <div style="color:var(--muted);font-size:13px;margin-top:6px">Rating: ${it.rating}</div>
+            <div class="card-actions">
+              <button class="btn" onclick="openTrailer('${it.trailer}')">Watch Trailer</button>
+              <a class="btn" target="_blank" href="${it.where}">Where to Watch</a>
+            </div>
+          </div>`;
+        catalogEl.appendChild(card);
+      });
+    }
+    function filterBy(type){render(data.filter(d=>d.type===type))}
+    function showAll(){render(data)}
+    function sortBy(key){
+      let arr=[...data];
+      if(key==='popular'||key==='rating')arr.sort((a,b)=>b.rating-a.rating);
+      if(key==='new')arr.sort((a,b)=>b.year-b.year);
+      render(arr);
+    }
+    searchInput.addEventListener('input',e=>{
+      const q=e.target.value.trim().toLowerCase();
+      if(!q)return showAll();
+      render(data.filter(d=>(d.title+' '+d.type).toLowerCase().includes(q)));
+    });
+
+    function openTrailer(yid){
+      if(!yid)return alert('No trailer');
+      const frame=document.getElementById('trailerFrame');
+      frame.src=`https://www.youtube.com/embed/${yid}?autoplay=1`;
+      const backdrop=document.getElementById('backdrop');
+      const modal=document.getElementById('modal');
+      const cinema=document.getElementById('cinema');
+      const ripple=document.getElementById('ripple');
+      backdrop.style.display='flex';backdrop.setAttribute('aria-hidden','false');
+      cinema.classList.add('active');ripple.classList.add('active');
+      setTimeout(()=>modal.classList.add('show'),50);
+      setTimeout(()=>ripple.classList.remove('active'),5000);
+    }
+    function closeModal(){
+      const modal=document.getElementById('modal');
+      const cinema=document.getElementById('cinema');
+      const ripple=document.getElementById('ripple');
+      modal.classList.remove('show');cinema.classList.remove('active');ripple.classList.remove('active');
+      setTimeout(()=>{
+        document.getElementById('backdrop').style.display='none';
+        document.getElementById('trailerFrame').src='';
+        document.getElementById('backdrop').setAttribute('aria-hidden','true');
+      },400);
+    }
+    render(data);
+  </script>
+</body>
+</html>
